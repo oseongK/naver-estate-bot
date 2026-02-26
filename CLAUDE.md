@@ -7,7 +7,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 # Install dependencies (Python 3.12)
 pip install -r requirements.txt
-playwright install chromium --with-deps
+# Note: --with-deps may fail on some systems due to yarn GPG key; install libs manually if needed:
+# sudo apt-get install -y libatk1.0-0 libatk-bridge2.0-0 libcups2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2t64
+PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 python -m playwright install chromium
 
 # Run full pipeline (scrape → Sheets → Notion)
 python main.py
@@ -23,7 +25,15 @@ python main.py --sheets-only      # skip scrape and Notion (requires existing da
 # Smoke-test individual modules
 python -c "from models import Listing; print('models OK')"
 python -c "import asyncio; from scraper import run_scraper; r = asyncio.run(run_scraper(['8928'])); print(len(r['8928']), 'listings')"
+
+# Test Sheets + Notion pipeline with mock data (bypasses scraper — works without Korean IP)
+python test_pipeline.py
 ```
+
+## Known Limitations
+
+- **Scraper requires a Korean IP.** `new.land.naver.com` blocks cloud/datacenter IPs (e.g. GitHub Codespaces on Azure). The scraper will time out and return 0 listings when run outside Korea. Set `PROXY_URL` to a Korean proxy to work around this.
+- **Google service account Drive quota.** The service account cannot create spreadsheets if its Drive quota is exceeded. Workaround: create the spreadsheet manually in your own Google account, share it (Editor role) with the service account email, and set `GOOGLE_SPREADSHEET_ID` in `.env`.
 
 ## Architecture
 
@@ -55,10 +65,13 @@ Uses Playwright + playwright-stealth to run a Chromium browser. API calls are ma
 
 ### First-run resource creation
 Both handlers auto-create missing resources on first run and log the generated IDs:
-- `sheets_handler`: creates spreadsheet, logs `GOOGLE_SPREADSHEET_ID`
+- `sheets_handler`: creates spreadsheet, logs `GOOGLE_SPREADSHEET_ID` — **or** create manually and share with the service account (Editor role) to avoid Drive quota issues
 - `notion_handler`: creates database under `NOTION_PARENT_PAGE_ID`, logs `NOTION_DATABASE_ID`
 
 Copy logged IDs into `.env` and GitHub Secrets before subsequent runs.
+
+### Mock pipeline test (`test_pipeline.py`)
+Generates synthetic `Listing` objects and runs the full Sheets → delta → Notion pipeline without scraping Naver. Use this to validate credentials and handler logic from any environment.
 
 ## Environment Variables
 
