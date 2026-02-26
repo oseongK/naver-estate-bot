@@ -1,0 +1,6 @@
+playwright==1.44.0
+playwright-stealth==1.0.6
+gspread==6.1.2
+google-auth==2.29.0
+notion-client==2.2.1
+python-dotenv==1.0.1
