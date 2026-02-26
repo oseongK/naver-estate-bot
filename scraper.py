@@ -79,7 +79,7 @@ def _parse_price_field(raw: str, trade_type: str) -> tuple[int, int]:
 async def build_browser_context(browser: Browser) -> BrowserContext:
     """Create a stealth Chromium context with randomised UA."""
     ua = random.choice(_USER_AGENTS)
-    context = await browser.new_context(
+    kwargs: dict = dict(
         user_agent=ua,
         viewport={"width": 1366 + random.randint(0, 200), "height": 768 + random.randint(0, 100)},
         locale="ko-KR",
@@ -88,6 +88,10 @@ async def build_browser_context(browser: Browser) -> BrowserContext:
             "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
         },
     )
+    if config.PROXY_URL:
+        kwargs["proxy"] = {"server": config.PROXY_URL}
+        log.info("Using proxy: %s", config.PROXY_URL)
+    context = await browser.new_context(**kwargs)
     return context
 
 

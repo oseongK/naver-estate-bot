@@ -76,6 +76,7 @@ Copy logged IDs into `.env` and GitHub Secrets before subsequent runs.
 | `MAX_LISTINGS_PER_COMPLEX` | Per-complex cap (default: `200`) |
 | `SLEEP_MIN` / `SLEEP_MAX` | Random delay range in seconds between requests |
 | `HEADLESS` | `true` for headless Chromium (always true in CI) |
+| `PROXY_URL` | Optional HTTP/SOCKS proxy, e.g. `http://user:pass@host:port` (needed outside Korea) |
 
 ## CI (GitHub Actions)
 Runs daily at 02:00 KST (17:00 UTC) via `.github/workflows/daily_scrape.yml`. Also supports `workflow_dispatch` for manual triggers. Playwright browser binaries are cached keyed on `requirements.txt` hash.

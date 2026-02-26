@@ -50,3 +50,4 @@ MAX_LISTINGS_PER_COMPLEX: int = _get_int("MAX_LISTINGS_PER_COMPLEX", 200)
 SLEEP_MIN: float = _get_float("SLEEP_MIN", 2.5)
 SLEEP_MAX: float = _get_float("SLEEP_MAX", 6.0)
 HEADLESS: bool = _get("HEADLESS", "true").lower() in ("1", "true", "yes")
+PROXY_URL: str = _get("PROXY_URL")  # e.g. http://user:pass@host:port
